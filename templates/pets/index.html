@@ -1,0 +1,33 @@
+<div class="page-header">
+  <h1>Pets</h1>
+</div>
+<ul class="list-unstyled list-inline">
+  <li><a href="<%= newPetsPath() %>" class="btn btn-primary">Create New Pet</a></li>
+</ul>
+
+<table class="table table-striped">
+  <thead>
+  <th>Name</th>
+    <th>OwnerID</th>
+    <th>&nbsp;</th>
+  </thead>
+  <tbody>
+    <%= for (pet) in pets { %>
+      <tr>
+      <td><%= pet.Name %></td>
+        <td><%= pet.OwnerID %></td>
+        <td>
+          <div class="pull-right">
+            <a href="<%= petPath({ pet_id: pet.ID }) %>" class="btn btn-info">View</a>
+            <a href="<%= editPetPath({ pet_id: pet.ID }) %>" class="btn btn-warning">Edit</a>
+            <a href="<%= petPath({ pet_id: pet.ID }) %>" data-method="DELETE" data-confirm="Are you sure?" class="btn btn-danger">Destroy</a>
+          </div>
+        </td>
+      </tr>
+    <% } %>
+  </tbody>
+</table>
+
+<div class="text-center">
+  <%= paginator(pagination) %>
+</div>

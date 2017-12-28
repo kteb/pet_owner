@@ -1,0 +1,13 @@
+<div class="page-header">
+  <h1>Owner#Show</h1>
+</div>
+
+<ul class="list-unstyled list-inline">
+  <li><a href="<%= ownersPath() %>" class="btn btn-info">Back to all Owners</a></li>
+  <li><a href="<%= editOwnerPath({ owner_id: owner.ID })%>" class="btn btn-warning">Edit</a></li>
+  <li><a href="<%= ownerPath({ owner_id: owner.ID })%>" data-method="DELETE" data-confirm="Are you sure?" class="btn btn-danger">Destroy</a>
+</ul>
+
+<p>
+  <strong>Name</strong>: <%= owner.Name %>
+</p>

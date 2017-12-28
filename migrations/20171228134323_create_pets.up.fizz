@@ -1,0 +1,5 @@
+create_table("pets", func(t) {
+	t.Column("id", "uuid", {"primary": true})
+	t.Column("name", "string", {})
+	t.Column("owner_id", "uuid", {})
+})

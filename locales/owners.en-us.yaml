@@ -1,0 +1,6 @@
+- id: "owner.created.success"
+  translation: "Owner was successfully created."
+- id: "owner.updated.success"
+  translation: "Owner was successfully updated."
+- id: "owner.destroyed.success"
+  translation: "Owner was successfully destroyed."
