@@ -30,22 +30,29 @@ func (v PetsResource) List(c buffalo.Context) error {
 	// Get the DB connection from the context
 	tx := c.Value("tx").(*pop.Connection)
 
-	pets := &models.Pets{}
+	// pets := &models.Pets{}
+	//
+	// // Paginate results. Params "page" and "per_page" control pagination.
+	// // Default values are "page=1" and "per_page=20".
+	// q := tx.PaginateFromParams(c.Params())
+	//
+	// // Retrieve all Pets from the DB
+	// if err := q.All(pets); err != nil {
+	// 	return errors.WithStack(err)
+	// }
 
-	// Paginate results. Params "page" and "per_page" control pagination.
-	// Default values are "page=1" and "per_page=20".
-	q := tx.PaginateFromParams(c.Params())
+	petOwners := &models.PetOwners{}
+	err := tx.RawQuery("select pets.id, pets.name as pet_name, owners.name as owner_name from pets inner join owners on pets.owner_id = owners.id").All(petOwners)
 
-	// Retrieve all Pets from the DB
-	if err := q.All(pets); err != nil {
+	if err != nil {
 		return errors.WithStack(err)
 	}
 
 	// Make Pets available inside the html template
-	c.Set("pets", pets)
+	c.Set("pets", petOwners)
 
-	// Add the paginator to the context so it can be used in the template.
-	c.Set("pagination", q.Paginator)
+	// // Add the paginator to the context so it can be used in the template.
+	// c.Set("pagination", q.Paginator)
 
 	return c.Render(200, r.HTML("pets/index.html"))
 }
@@ -64,6 +71,17 @@ func (v PetsResource) Show(c buffalo.Context) error {
 		return c.Error(404, err)
 	}
 
+	// Allocate an empty Owner
+	owner := &models.Owner{}
+
+	// To find the Owner the parameter owner_id is used.
+	if err := tx.Find(owner, pet.OwnerID); err != nil {
+		return c.Error(404, err)
+	}
+
+	// Make owner available inside the html template
+	c.Set("owner", owner)
+
 	// Make pet available inside the html template
 	c.Set("pet", pet)
 
@@ -73,6 +91,16 @@ func (v PetsResource) Show(c buffalo.Context) error {
 // New renders the form for creating a new Pet.
 // This function is mapped to the path GET /pets/new
 func (v PetsResource) New(c buffalo.Context) error {
+	// Initialize the list of persons
+	owners, err := selectOwners(c)
+
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	// Make persons availble inside the html template
+	c.Set("owners", owners)
+
 	// Make pet available inside the html template
 	c.Set("pet", &models.Pet{})
 
@@ -121,6 +149,16 @@ func (v PetsResource) Create(c buffalo.Context) error {
 // Edit renders a edit form for a Pet. This function is
 // mapped to the path GET /pets/{pet_id}/edit
 func (v PetsResource) Edit(c buffalo.Context) error {
+	// Initialize the list of persons
+	owners, err := selectOwners(c)
+
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	// Make persons availble inside the html template
+	c.Set("owners", owners)
+
 	// Get the DB connection from the context
 	tx := c.Value("tx").(*pop.Connection)
 

@@ -7,15 +7,15 @@
 
 <table class="table table-striped">
   <thead>
-  <th>Name</th>
-    <th>OwnerID</th>
+  <th>Pet Name</th>
+    <th>Owner Name</th>
     <th>&nbsp;</th>
   </thead>
   <tbody>
     <%= for (pet) in pets { %>
       <tr>
-      <td><%= pet.Name %></td>
-        <td><%= pet.OwnerID %></td>
+      <td><%= pet.PetName %></td>
+        <td><%= pet.OwnerName %></td>
         <td>
           <div class="pull-right">
             <a href="<%= petPath({ pet_id: pet.ID }) %>" class="btn btn-info">View</a>
@@ -27,7 +27,3 @@
     <% } %>
   </tbody>
 </table>
-
-<div class="text-center">
-  <%= paginator(pagination) %>
-</div>
