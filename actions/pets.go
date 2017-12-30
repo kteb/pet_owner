@@ -30,20 +30,15 @@ func (v PetsResource) List(c buffalo.Context) error {
 	// Get the DB connection from the context
 	tx := c.Value("tx").(*pop.Connection)
 
-	// pets := &models.Pets{}
-	//
-	// // Paginate results. Params "page" and "per_page" control pagination.
-	// // Default values are "page=1" and "per_page=20".
-	// q := tx.PaginateFromParams(c.Params())
-	//
-	// // Retrieve all Pets from the DB
-	// if err := q.All(pets); err != nil {
-	// 	return errors.WithStack(err)
-	// }
-
+	pop.MapTableName("PetOwner", "pets")
 	petOwners := &models.PetOwners{}
-	err := tx.RawQuery("select pets.id, pets.name as pet_name, owners.name as owner_name from pets inner join owners on pets.owner_id = owners.id").All(petOwners)
 
+	// Paginate results. Params "page" and "per_page" control pagination.
+	// Default values are "page=1" and "per_page=20".
+	q := tx.PaginateFromParams(c.Params())
+
+	// Retrieve all Pets from the DB
+	err := q.Join("owners", " owners.id = pets.owner_id").All(petOwners)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -51,8 +46,8 @@ func (v PetsResource) List(c buffalo.Context) error {
 	// Make Pets available inside the html template
 	c.Set("pets", petOwners)
 
-	// // Add the paginator to the context so it can be used in the template.
-	// c.Set("pagination", q.Paginator)
+	// Add the paginator to the context so it can be used in the template.
+	c.Set("pagination", q.Paginator)
 
 	return c.Render(200, r.HTML("pets/index.html"))
 }
@@ -62,6 +57,8 @@ func (v PetsResource) List(c buffalo.Context) error {
 func (v PetsResource) Show(c buffalo.Context) error {
 	// Get the DB connection from the context
 	tx := c.Value("tx").(*pop.Connection)
+
+	pop.MapTableName("Pet", "pets")
 
 	// Allocate an empty Pet
 	pet := &models.Pet{}
@@ -155,6 +152,8 @@ func (v PetsResource) Edit(c buffalo.Context) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
+
+	pop.MapTableName("Pet", "pets")
 
 	// Make persons availble inside the html template
 	c.Set("owners", owners)
